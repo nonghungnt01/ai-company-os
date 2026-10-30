@@ -67,7 +67,13 @@ export default function AdminPage() {
       const agentData = await agentRes.json();
 
       if (agentData.ok) {
-        setStatus(`✅ ${agentSlug} xong rồi! (${agentData.pain_points_count ?? 0} kết quả)`);
+        // Xử lý hiển thị thông báo thành công tùy theo agent
+        let successMsg = `✅ ${agentSlug} xong rồi!`;
+        if (agentData.pain_points_count !== undefined) successMsg += ` (${agentData.pain_points_count} kết quả)`;
+        if (agentData.product_name) successMsg += ` (Tool: ${agentData.product_name})`;
+        if (agentData.article_title) successMsg += ` (Bài: ${agentData.article_title})`;
+        
+        setStatus(successMsg);
       } else {
         setStatus(`⚠ ${agentSlug} lỗi: ${agentData.error}`);
       }
@@ -221,7 +227,8 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {t.output?.pain_points && t.output.pain_points.length > 0 && (
+              {/* Hiển thị nếu là Scout */}
+              {t.agent_slug === "scout" && t.output?.pain_points && (
                 <div>
                   <strong style={{ color: "#333", display: "block", marginBottom: 6 }}>🧠 Suy nghĩ / Kết quả của AI:</strong>
                   {t.output.pain_points.map((p: any, idx: number) => (
@@ -236,19 +243,6 @@ export default function AdminPage() {
                           🔗 Nguồn: {p.evidence_url}
                         </a>
                       )}
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {/* Hiển thị nếu là Scout */}
-              {t.agent_slug === "scout" && t.output?.pain_points && (
-                <div>
-                  <strong style={{ color: "#333", display: "block", marginBottom: 6 }}>🧠 Suy nghĩ / Kết quả của AI:</strong>
-                  {t.output.pain_points.map((p: any, idx: number) => (
-                    <div key={idx} style={{ marginBottom: 8, paddingLeft: 10, borderLeft: "2px solid #0070f3" }}>
-                      <div style={{ fontWeight: 600, color: "#111" }}>{idx + 1}. {p.title}</div>
-                      <div style={{ color: "#666", marginTop: 2 }}>Phân loại: {p.category} • Điểm: {p.score}/100</div>
                     </div>
                   ))}
                 </div>
@@ -270,10 +264,27 @@ export default function AdminPage() {
                   </div>
                 </div>
               )}
+
+              {/* Hiển thị nếu là Writer */}
+              {t.agent_slug === "writer" && t.output?.article && (
+                <div>
+                  <strong style={{ color: "#333", display: "block", marginBottom: 6 }}>📝 Bài viết AI tạo:</strong>
+                  <div style={{ padding: 10, background: "#fff8f0", borderRadius: 6, border: "1px solid #ffe0b3" }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: "#b35c00" }}>{t.output.article.title}</div>
+                    <div style={{ color: "#666", marginTop: 4, fontSize: 11 }}>
+                      Slug: <code>{t.output.article.slug}</code>
+                      <br />Số từ: {t.output.article.word_count}
+                      <br />Trạng thái: DRAFT (chờ duyệt)
+                    </div>
+                  </div>
+                </div>
+              )}
               
-              {(!t.output || (!t.output.pain_points && !t.output.product)) && t.status === "SUCCESS" && (
+              {/* Thông báo nếu không có dữ liệu output */}
+              {(!t.output || (!t.output.pain_points && !t.output.product && !t.output.article)) && t.status === "SUCCESS" && (
                 <div style={{ color: "#888", fontStyle: "italic" }}>Không có dữ liệu chi tiết.</div>
               )}
+            </div>
           </details>
         ))}
       </section>
