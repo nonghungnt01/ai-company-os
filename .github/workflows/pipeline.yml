@@ -1,0 +1,36 @@
+name: AI Company 24-7 Pipeline
+
+on:
+  schedule:
+    # Tự động chạy vào phút thứ 0 của mỗi 2 tiếng (0h, 2h, 4h, 6h...)
+    - cron: '0 */2 * * *'
+  # Cho phép bấm chạy bằng tay để test
+  workflow_dispatch:
+
+jobs:
+  run-all-agents:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Scout (Tìm thị trường)
+        run: curl -s "https://ai-company-os.vercel.app/api/agents/scout?secret=${{ secrets.CRON_SECRET }}"
+      
+      - name: Wait
+        run: sleep 5
+        
+      - name: Run Builder (Thiết kế Tool)
+        run: curl -s "https://ai-company-os.vercel.app/api/agents/builder?secret=${{ secrets.CRON_SECRET }}"
+
+      - name: Wait
+        run: sleep 5
+        
+      - name: Run Writer (Viết bài SEO)
+        run: curl -s "https://ai-company-os.vercel.app/api/agents/writer?secret=${{ secrets.CRON_SECRET }}"
+        
+      - name: Wait
+        run: sleep 5
+        
+      - name: Run Closer (Soạn Email)
+        run: curl -s "https://ai-company-os.vercel.app/api/agents/closer?secret=${{ secrets.CRON_SECRET }}"
+        
+      - name: Run CFO (Báo cáo tài chính)
+        run: curl -s "https://ai-company-os.vercel.app/api/agents/cfo?secret=${{ secrets.CRON_SECRET }}"
