@@ -287,6 +287,7 @@ export default function AdminPage() {
               )}
               
               {(!t.output || (!t.output.pain_points && !t.output.product && !t.output.article)) && t.status === "SUCCESS" && (
+              <div style={{ color: "#888", fontStyle: "italic" }}>Không có dữ liệu chi tiết.</div>
             </div>
           </details>
         ))}
