@@ -17,13 +17,17 @@ export async function POST(req: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const { error } = await supabase.from("tasks").insert({
-    agent_slug: agentSlug,
-    status: "PENDING",
-    assigned_by: "admin",
-    admin_instruction: instruction,
-    is_mock: false,
-  });
+  const { data: taskRow, error } = await supabase
+    .from("tasks")
+    .insert({
+      agent_slug: agentSlug,
+      status: "PENDING",
+      assigned_by: "admin",
+      admin_instruction: instruction,
+      is_mock: false,
+    })
+    .select()
+    .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
@@ -33,11 +37,6 @@ export async function POST(req: NextRequest) {
     content: instruction,
   });
 
-  // Trigger agent chạy ngay (fire-and-forget, không đợi kết quả)
-  const origin = req.nextUrl.origin;
-  fetch(`${origin}/api/agents/${agentSlug}?secret=${process.env.CRON_SECRET}`).catch(
-    () => {}
-  );
-
-  return NextResponse.json({ ok: true });
+  // KHÔNG trigger ở đây nữa — client sẽ tự gọi
+  return NextResponse.json({ ok: true, task_id: taskRow.id, agent_slug: agentSlug });
 }
