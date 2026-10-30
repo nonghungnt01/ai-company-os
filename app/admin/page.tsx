@@ -270,10 +270,23 @@ export default function AdminPage() {
                   </div>
                 </div>
               )}
-              
-              {(!t.output || (!t.output.pain_points && !t.output.product)) && t.status === "SUCCESS" && (
-                <div style={{ color: "#888", fontStyle: "italic" }}>Không có dữ liệu chi tiết.</div>
+
+              {/* Hiển thị nếu là Writer */}
+              {t.agent_slug === "writer" && t.output?.article && (
+                <div>
+                  <strong style={{ color: "#333", display: "block", marginBottom: 6 }}>📝 Bài viết AI tạo:</strong>
+                  <div style={{ padding: 10, background: "#fff8f0", borderRadius: 6, border: "1px solid #ffe0b3" }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: "#b35c00" }}>{t.output.article.title}</div>
+                    <div style={{ color: "#666", marginTop: 4, fontSize: 11 }}>
+                      Slug: <code>{t.output.article.slug}</code>
+                      <br />Số từ: {t.output.article.word_count}
+                      <br />Trạng thái: DRAFT (chờ duyệt)
+                    </div>
+                  </div>
+                </div>
               )}
+              
+              {(!t.output || (!t.output.pain_points && !t.output.product && !t.output.article)) && t.status === "SUCCESS" && (
             </div>
           </details>
         ))}
