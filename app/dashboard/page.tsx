@@ -268,6 +268,11 @@ function AgentRow({ agent, locked }: { agent: Agent; locked?: boolean }) {
           Cần MRR ${Number(agent.unlock_mrr_usd).toFixed(2)}
         </div>
       )}
+      {agent.last_run_at && (
+        <div style={{ fontSize: 10, color: "#999", marginTop: 4 }}>
+          Lần chạy cuối: {new Date(agent.last_run_at).toLocaleString("vi-VN")}
+        </div>
+      )}
     </div>
   );
 }
