@@ -143,37 +143,97 @@ export default function AdminPage() {
       <section style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 16, marginBottom: 10 }}>📋 Công việc gần đây</h2>
         {tasks.length === 0 && <p style={{ fontSize: 13, color: "#999" }}>Chưa có task nào</p>}
+        
         {tasks.map((t) => (
-          <div
+          <details
             key={t.id}
-            style={{ border: "1px solid #eee", borderRadius: 6, padding: 10, marginBottom: 8, fontSize: 13 }}
+            style={{
+              border: "1px solid #ddd",
+              borderRadius: 8,
+              marginBottom: 10,
+              background: "#fff",
+              overflow: "hidden",
+            }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-              <strong>{t.agent_slug.toUpperCase()}</strong>
-              <span
-                style={{
-                  fontSize: 11,
-                  padding: "2px 6px",
-                  borderRadius: 4,
-                  background: t.status === "SUCCESS" ? "#d4f4dd" : t.status === "FAILED" ? "#fde" : t.status === "RUNNING" ? "#e6f0ff" : "#eee",
-                }}
-              >
-                {t.status}
-              </span>
-            </div>
-            {t.assigned_by === "admin" && (
-              <div style={{ color: "#c60", fontSize: 11, marginBottom: 4 }}>👤 Admin: {t.admin_instruction}</div>
-            )}
-            {t.output?.pain_points && (
-              <div style={{ color: "#666", fontSize: 11 }}>
-                → {t.output.pain_points.length} pain points
+            {/* Phần tóm tắt (luôn hiện) */}
+            <summary
+              style={{
+                padding: "12px",
+                cursor: "pointer",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                background: "#fafafa",
+              }}
+            >
+              <div>
+                <strong style={{ fontSize: 13 }}>{t.agent_slug.toUpperCase()}</strong>
+                {t.assigned_by === "admin" && <span style={{ fontSize: 10, color: "#c60", marginLeft: 6 }}>👤 Admin giao</span>}
               </div>
-            )}
-            {t.error && <div style={{ color: "#c00", fontSize: 11 }}>⚠ {t.error}</div>}
-            <div style={{ color: "#aaa", fontSize: 10, marginTop: 4 }}>
-              {new Date(t.started_at).toLocaleString("vi-VN")}
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 10, color: "#aaa" }}>
+                  {new Date(t.started_at).toLocaleTimeString("vi-VN")}
+                </span>
+                <span
+                  style={{
+                    fontSize: 10,
+                    padding: "2px 8px",
+                    borderRadius: 10,
+                    fontWeight: 600,
+                    background:
+                      t.status === "SUCCESS" ? "#d4f4dd" :
+                      t.status === "FAILED" ? "#fde" :
+                      t.status === "RUNNING" ? "#e6f0ff" : "#eee",
+                    color:
+                      t.status === "SUCCESS" ? "#080" :
+                      t.status === "FAILED" ? "#c00" :
+                      t.status === "RUNNING" ? "#036" : "#666",
+                  }}
+                >
+                  {t.status}
+                </span>
+              </div>
+            </summary>
+
+            {/* Phần chi tiết (khi bấm vào sẽ xổ xuống) */}
+            <div style={{ padding: 12, borderTop: "1px solid #eee", fontSize: 12 }}>
+              {t.admin_instruction && (
+                <div style={{ marginBottom: 10, padding: 8, background: "#fff8e6", borderRadius: 4, borderLeft: "3px solid #f5a623" }}>
+                  <strong>Mệnh lệnh của bạn:</strong> {t.admin_instruction}
+                </div>
+              )}
+
+              {t.error && (
+                <div style={{ color: "#c00", marginBottom: 10, padding: 8, background: "#fee", borderRadius: 4 }}>
+                  ⚠ <strong>Lỗi:</strong> {t.error}
+                </div>
+              )}
+
+              {t.output?.pain_points && t.output.pain_points.length > 0 && (
+                <div>
+                  <strong style={{ color: "#333", display: "block", marginBottom: 6 }}>🧠 Suy nghĩ / Kết quả của AI:</strong>
+                  {t.output.pain_points.map((p: any, idx: number) => (
+                    <div key={idx} style={{ marginBottom: 8, paddingLeft: 10, borderLeft: "2px solid #0070f3" }}>
+                      <div style={{ fontWeight: 600, color: "#111" }}>{idx + 1}. {p.title}</div>
+                      <div style={{ color: "#666", marginTop: 2 }}>
+                        Phân loại: <span style={{ background: "#eee", padding: "1px 4px", borderRadius: 3 }}>{p.category}</span>
+                        {" • "}Điểm: {p.score}/100
+                      </div>
+                      {p.evidence_url && (
+                        <a href={p.evidence_url} target="_blank" rel="noreferrer" style={{ color: "#0070f3", textDecoration: "none", display: "block", marginTop: 4, fontSize: 11, wordBreak: "break-all" }}>
+                          🔗 Nguồn: {p.evidence_url}
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {(!t.output?.pain_points || t.output.pain_points.length === 0) && t.status === "SUCCESS" && (
+                <div style={{ color: "#888", fontStyle: "italic" }}>AI không tìm thấy pain point nào phù hợp.</div>
+              )}
             </div>
-          </div>
+          </details>
         ))}
       </section>
 
