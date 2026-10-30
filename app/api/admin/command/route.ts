@@ -17,10 +17,9 @@ export async function POST(req: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  // Ghi task vào DB để Agent nhặt lên làm
   const { error } = await supabase.from("tasks").insert({
     agent_slug: agentSlug,
-    status: "PENDING", // Trạng thái chờ Agent nhặt
+    status: "PENDING",
     assigned_by: "admin",
     admin_instruction: instruction,
     is_mock: false,
@@ -28,12 +27,17 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Ghi log tin nhắn
   await supabase.from("agent_messages").insert({
     from_role: "admin",
     to_role: agentSlug,
     content: instruction,
   });
+
+  // Trigger agent chạy ngay (fire-and-forget, không đợi kết quả)
+  const origin = req.nextUrl.origin;
+  fetch(`${origin}/api/agents/${agentSlug}?secret=${process.env.CRON_SECRET}`).catch(
+    () => {}
+  );
 
   return NextResponse.json({ ok: true });
 }
