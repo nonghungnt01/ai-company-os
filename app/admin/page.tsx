@@ -53,13 +53,25 @@ export default function AdminPage() {
         body: JSON.stringify({ agentSlug, instruction: command }),
       });
       const data = await res.json();
-      if (data.ok) {
-        setStatus(`✅ Đã giao việc cho ${agentSlug}!`);
-        setCommand("");
-        setTimeout(fetchLogs, 2000);
-      } else {
+      if (!data.ok) {
         setStatus(`❌ Lỗi: ${data.error}`);
+        return;
       }
+
+      setCommand("");
+      setStatus(`⚙ Đã giao việc. Đang kích hoạt ${agentSlug}...`);
+
+      // Browser tự gọi agent — KHÔNG bị Vercel kill
+      const secret = sessionStorage.getItem("admin_secret");
+      const agentRes = await fetch(`/api/agents/${agentSlug}?secret=${secret}`);
+      const agentData = await agentRes.json();
+
+      if (agentData.ok) {
+        setStatus(`✅ ${agentSlug} xong rồi! (${agentData.pain_points_count ?? 0} kết quả)`);
+      } else {
+        setStatus(`⚠ ${agentSlug} lỗi: ${agentData.error}`);
+      }
+      setTimeout(fetchLogs, 1000);
     } catch (err: any) {
       setStatus(`❌ Lỗi mạng: ${err.message}`);
     }
