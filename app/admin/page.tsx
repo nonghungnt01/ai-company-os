@@ -241,8 +241,38 @@ export default function AdminPage() {
                 </div>
               )}
               
-              {(!t.output?.pain_points || t.output.pain_points.length === 0) && t.status === "SUCCESS" && (
-                <div style={{ color: "#888", fontStyle: "italic" }}>AI không tìm thấy pain point nào phù hợp.</div>
+              {/* Hiển thị nếu là Scout */}
+              {t.agent_slug === "scout" && t.output?.pain_points && (
+                <div>
+                  <strong style={{ color: "#333", display: "block", marginBottom: 6 }}>🧠 Suy nghĩ / Kết quả của AI:</strong>
+                  {t.output.pain_points.map((p: any, idx: number) => (
+                    <div key={idx} style={{ marginBottom: 8, paddingLeft: 10, borderLeft: "2px solid #0070f3" }}>
+                      <div style={{ fontWeight: 600, color: "#111" }}>{idx + 1}. {p.title}</div>
+                      <div style={{ color: "#666", marginTop: 2 }}>Phân loại: {p.category} • Điểm: {p.score}/100</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Hiển thị nếu là Builder */}
+              {t.agent_slug === "builder" && t.output?.product && (
+                <div>
+                  <strong style={{ color: "#333", display: "block", marginBottom: 6 }}>🛠️ Sản phẩm AI thiết kế:</strong>
+                  <div style={{ padding: 10, background: "#f0f8ff", borderRadius: 6, border: "1px solid #cce5ff" }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: "#0056b3" }}>{t.output.product.name}</div>
+                    <div style={{ color: "#555", marginTop: 4 }}>{t.output.product.description}</div>
+                    <div style={{ fontWeight: 600, marginTop: 6, color: "#080" }}>Giá bán: ${t.output.product.price_usd}</div>
+                    {t.output.features && (
+                      <ul style={{ margin: "8px 0 0 16px", padding: 0, fontSize: 11, color: "#666" }}>
+                        {t.output.features.map((f: string, i: number) => <li key={i}>{f}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {(!t.output || (!t.output.pain_points && !t.output.product)) && t.status === "SUCCESS" && (
+                <div style={{ color: "#888", fontStyle: "italic" }}>Không có dữ liệu chi tiết.</div>
               )}
             </div>
           </details>
