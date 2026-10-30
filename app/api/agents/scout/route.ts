@@ -5,8 +5,9 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-const HN_API =
-  "https://hn.algolia.com/api/v1/search_by_date?tags=show_hn&hitsPerPage=10";
+// Tính thời gian 2 tiếng trước (tính bằng giây)
+const twoHoursAgo = Math.floor(Date.now() / 1000) - (2 * 60 * 60);
+const HN_API = `https://hn.algolia.com/api/v1/search_by_date?tags=show_hn&hitsPerPage=5&numericFilters=created_at_i>${twoHoursAgo}`;
 const GROQ_API = "https://api.groq.com/openai/v1/chat/completions";
 const MODEL = "openai/gpt-oss-20b";
 
