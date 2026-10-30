@@ -8,7 +8,7 @@ export const maxDuration = 60;
 const HN_API =
   "https://hn.algolia.com/api/v1/search_by_date?tags=show_hn&hitsPerPage=10";
 const GROQ_API = "https://api.groq.com/openai/v1/chat/completions";
-const MODEL = "llama-3.3-70b-versatile";
+const MODEL = "openai/gpt-oss-20b";
 
 export async function GET(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get("secret");
